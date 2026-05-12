@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -32,8 +33,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             name: 'create_user',
         ),
         new Post(
-            uriTemplate: '/login_check',
-            name: 'login_check',
+            uriTemplate: '/login',
+            name: 'login',
         ),
         new Get(),
         new Patch(),
@@ -83,18 +84,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
      * @var Collection<int, Company>
      */
     #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'user')]
+    #[MaxDepth(1)]
     private Collection $companies;
-
-    /**
-     * @var Collection<int, Customer>
-     */
-    #[ORM\OneToMany(targetEntity: Customer::class, mappedBy: 'user')]
-    private Collection $customers;
 
     public function __construct()
     {
         $this->companies = new ArrayCollection();
-        $this->customers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,7 +135,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function getRoles(): array
     {
-        return ["ROLE_USER"];
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): static
@@ -174,36 +172,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
             // set the owning side to null (unless already changed)
             if ($company->getUser() === $this) {
                 $company->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Customer>
-     */
-    public function getCustomers(): Collection
-    {
-        return $this->customers;
-    }
-
-    public function addCustomer(Customer $customer): static
-    {
-        if (!$this->customers->contains($customer)) {
-            $this->customers->add($customer);
-            $customer->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCustomer(Customer $customer): static
-    {
-        if ($this->customers->removeElement($customer)) {
-            // set the owning side to null (unless already changed)
-            if ($customer->getUser() === $this) {
-                $customer->setUser(null);
             }
         }
 

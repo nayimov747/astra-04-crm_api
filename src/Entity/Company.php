@@ -3,15 +3,49 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
+use App\Controller\GetCompaniesByUserAction;
 use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/company/by-user',
+            controller: GetCompaniesByUserAction::class,
+            openapi: new Operation(
+                parameters: [
+                    new Parameter(
+                        name: 'userId',
+                        in: 'query',
+                        description: 'Companiyalarni user.id bo\'yicha olish',
+                        required: true,
+                        schema: ['type' => 'integer', 'required' => true],
+                    )
+                ]
+            )
+        ),
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Patch(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['company:read']],
+    denormalizationContext: ['groups' => ['company:write']],
+)]
 class Company
 {
     #[ORM\Id]
@@ -21,22 +55,26 @@ class Company
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Name bo'sh bo'lmasligi kerak")]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['company:read', 'company:write'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "phone bo'sh bo'lmasligi kerak")]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['company:read', 'company:write'])]
     private ?string $phone = null;
 
     #[ORM\ManyToOne(inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['company:read', 'company:write'])]
+    #[MaxDepth(1)]
     private ?User $user = null;
 
     /**
      * @var Collection<int, Customer>
      */
     #[ORM\OneToMany(targetEntity: Customer::class, mappedBy: 'company')]
+    #[Groups(['company:read'])]
+    #[MaxDepth(1)]
     private Collection $customers;
 
     public function __construct()

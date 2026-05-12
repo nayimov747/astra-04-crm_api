@@ -6,10 +6,14 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['customer:read']],
+    denormalizationContext: ['groups' => ['customer:write']],
+)]
 class Customer
 {
     #[ORM\Id]
@@ -19,26 +23,24 @@ class Customer
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "fullName bo'sh bo'lmasligi kerak")]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['customer:read', 'customer:write', 'company:read'])]
     private ?string $fullName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Email bo'sh bo'lmasligi kerak")]
     #[Assert\Email(message: "Email formati xato")]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['customer:read', 'customer:write', 'company:read'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "phone bo'sh bo'lmasligi kerak")]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['customer:read', 'customer:write', 'company:read'])]
     private ?string $phone = null;
 
     #[ORM\ManyToOne(inversedBy: 'customers')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
-
-    #[ORM\ManyToOne(inversedBy: 'customers')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['customer:read', 'customer:write'])]
+    #[MaxDepth(1)]
     private ?Company $company = null;
 
     public function getId(): ?int
@@ -78,18 +80,6 @@ class Customer
     public function setPhone(string $phone): static
     {
         $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
 
         return $this;
     }
