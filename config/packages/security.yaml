@@ -17,11 +17,11 @@ security:
             security: false
 
         # /api/users/create endpoint'iga POST orqali murojaat qilinganda - token so'ralmasin
-        user_create:
-            pattern: ^/api/users/create$
-            methods:
-                - post
-            security: false
+#        user_create:
+#            pattern: ^/api/users/create$
+#            methods:
+#                - post
+#            security: false
 
         main:
             stateless: true
@@ -35,6 +35,16 @@ security:
             jwt: ~
 
     # Note: Only the *first* matching rule is applied
+#    access_control:
+#        - { path: ^/api/.+, roles: IS_AUTHENTICATED_FULLY }
+#        - { path: ^/api, roles: PUBLIC_ACCESS }
     access_control:
-        - { path: ^/api/.+, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api, roles: PUBLIC_ACCESS }
+        # login va register ochiq
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/users/create, roles: PUBLIC_ACCESS }
+
+        # swagger ochiq bo‘lishi mumkin
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+
+        # hamma API lar token bilan
+#        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

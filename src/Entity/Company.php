@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/company/by-user',
+            uriTemplate: '/companies/by-user',
             controller: GetCompaniesByUserAction::class,
             openapi: new Operation(
                 parameters: [

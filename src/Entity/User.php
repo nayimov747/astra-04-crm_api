@@ -42,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']],
-    paginationItemsPerPage: 5
+//    paginationItemsPerPage: 5
 )]
 #[UniqueEntity('email', message: "Bu email allaqachon mavjud")]
 #[ApiFilter(
