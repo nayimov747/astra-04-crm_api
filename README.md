@@ -35,25 +35,26 @@ git clone https://github.com/nayimov747/astra-04-crm_api.git
 cd crm-api
 
 composer install
-
+```
 Create .env.local
 
+```bash
 DATABASE_URL=""
 JWT_PASSPHRASE=""
-
+```
 Generate JWT keys:
-
+```bash
 php bin/console lexik:jwt:generate-keypair
+```
 
 Run migrations:
-
+```bash
 php bin/console doctrine:migrations:migrate
+```
 
 Start server:
-
+```bash
 symfony server:start
-API Documentation
+```
 
-Available at:
 
-/api
