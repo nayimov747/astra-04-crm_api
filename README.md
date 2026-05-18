@@ -31,17 +31,21 @@ REST API backend for Astra CRM built with Symfony and API Platform.
 
 ```bash
 git clone https://github.com/nayimov747/astra-04-crm_api.git
-
 cd crm-api
-
 composer install
 ```
-Create .env.local
 
+Create .env.local
 ```bash
 DATABASE_URL=""
 JWT_PASSPHRASE=""
 ```
+
+Create database:
+```bash
+php bin/console doctrine:database:create
+```
+
 Generate JWT keys:
 ```bash
 php bin/console lexik:jwt:generate-keypair
