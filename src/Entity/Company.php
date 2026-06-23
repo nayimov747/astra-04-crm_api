@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ApiResource(
@@ -59,9 +60,18 @@ class Company
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "phone bo'sh bo'lmasligi kerak")]
+    #[Assert\NotBlank(message: "Email bo'sh bo'lmasligi kerak")]
     #[Groups(['company:read', 'company:write'])]
-    private ?string $phone = null;
+    private ?string $email = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Password bo'sh bo'lmasligi kerak")]
+    #[Groups(['company:read', 'company:write'])]
+    private ?string $password = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups(['company:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'companies')]
     #[ORM\JoinColumn(nullable: false)]
@@ -80,6 +90,7 @@ class Company
     public function __construct()
     {
         $this->customers = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -99,16 +110,33 @@ class Company
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getEmail(): ?string
     {
-        return $this->phone;
+        return $this->email;
     }
 
-    public function setPhone(string $phone): static
+    public function setEmail(string $email): static
     {
-        $this->phone = $phone;
+        $this->email = $email;
 
         return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 
     public function getUser(): ?User
