@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource(
@@ -33,15 +34,24 @@ class Customer
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "phone bo'sh bo'lmasligi kerak")]
+    #[Assert\NotBlank(message: "Password bo'sh bo'lmasligi kerak")]
     #[Groups(['customer:read', 'customer:write', 'company:read'])]
-    private ?string $phone = null;
+    private ?string $password = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups(['company:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'customers')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['customer:read', 'customer:write'])]
     #[MaxDepth(1)]
     private ?Company $company = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -72,14 +82,14 @@ class Customer
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getPassword(): ?string
     {
-        return $this->phone;
+        return $this->password;
     }
 
-    public function setPhone(string $phone): static
+    public function setPassword(string $password): static
     {
-        $this->phone = $phone;
+        $this->password = $password;
 
         return $this;
     }
@@ -94,5 +104,10 @@ class Customer
         $this->company = $company;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }
